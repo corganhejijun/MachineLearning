@@ -5,7 +5,7 @@ import numpy as np
 from PIL import Image
 
 folder = sys.argv[1]
-savePath = "D:\\cvDB\\frontal_30\\train"
+savePath = "D:\\git\\MachineLearning\\Face_Generate"
 
 def trueOrFalse():
     return np.random.random_sample() > 0.5
@@ -47,10 +47,13 @@ def genRandomMask(img):
             imgArray[x:x+gap, j, :] = [0, 0, 0]
     return imgArray
 
-def resizeImg(path):
+def resizeImg(path, noMask = False):
     img = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
     img = cv2.resize(img, (256, 256))
-    maskImg = genRandomMask(img)
+    if (noMask):
+        maskImg = img
+    else:
+        maskImg = genRandomMask(img)
     target = Image.new('RGB', (img.shape[0]*2, img.shape[1]))
     target.paste(Image.fromarray(img), (0, 0))
     target.paste(Image.fromarray(maskImg), (img.shape[0] + 1, 0))
@@ -61,5 +64,5 @@ for file in os.listdir(folder):
         continue
     path = os.path.join(folder, file) 
     print "processing {0}".format(path)
-    result = resizeImg(path)
+    result = resizeImg(path, True)
     result.save(os.path.join(savePath, file))
