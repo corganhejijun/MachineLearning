@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "args": [
-                "F:\\Program\\CV_Data\\img_align_celeba"
+                "F:\\Program\\CV_Data\\lfw_all"
             ],
             "exceptionHandling": {
                 "always": ["IndexError"],

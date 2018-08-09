@@ -11,8 +11,8 @@ FRONT_FACE_STANDARD = "Andre_Agassi_0010.jpg"
 shapePredict = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 detector = dlib.get_frontal_face_detector()
 NOSE_CENTER_NUMBER = 30
-FRONT_THRESHOLD_DISTANCE = 70
-DEST_PATH = "F:\\Program\\CV_Data\\frontal"
+FRONT_THRESHOLD_DISTANCE = 30
+DEST_PATH = "F:\\Program\\CV_Data\\frontal_30"
 
 def getFaceDis(path):
     img = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
@@ -57,6 +57,8 @@ standardLandmarks = getStandardFace()
 if (not os.path.exists(DEST_PATH)):
     os.mkdir(DEST_PATH)
 for file in os.listdir(folder): 
+    if (os.path.exists(os.path.join(DEST_PATH, file))):
+        continue
     path = os.path.join(folder, file) 
     if os.path.isdir(path): 
         continue
