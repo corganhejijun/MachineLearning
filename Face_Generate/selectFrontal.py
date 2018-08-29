@@ -12,7 +12,7 @@ shapePredict = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 detector = dlib.get_frontal_face_detector()
 NOSE_CENTER_NUMBER = 30
 FRONT_THRESHOLD_DISTANCE = 30
-DEST_PATH = "F:\\Program\\CV_Data\\frontal_30"
+DEST_PATH = "D:\\cvDB\\lfw_30"
 
 def getFaceDis(path):
     img = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)

@@ -3,9 +3,28 @@ import os, sys
 import cv2
 import numpy as np
 from PIL import Image
+import dlib
 
 folder = sys.argv[1]
-savePath = "D:\\git\\MachineLearning\\Face_Generate"
+savePath = "D:\\git\\MachineLearning\\Face_Generate\\out"
+detector = dlib.get_frontal_face_detector()
+shapePredict = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+
+def getBound(img, shape):
+    xMin = len(img[0])
+    xMax = 0
+    yMin = len(img)
+    yMax = 0
+    for i in range(shape.num_parts):
+        if (shape.part(i).x < xMin):
+            xMin = shape.part(i).x
+        if (shape.part(i).x > xMax):
+            xMax = shape.part(i).x
+        if (shape.part(i).y < yMin):
+            yMin = shape.part(i).y
+        if (shape.part(i).y > yMax):
+            yMax = shape.part(i).y
+    return xMin, xMax, yMin, yMax
 
 def trueOrFalse():
     return np.random.random_sample() > 0.5
@@ -17,6 +36,15 @@ def plusOrMinus():
     if (number > 0.7):
         return 1
     return 0
+
+def getFace(img):
+    dets = detector(img, 1)
+    if (len(dets) == 0):
+        print("file %s has no face" % file)
+        return None, None, None, None
+    det = dets[0]
+    shape = shapePredict(img, det)
+    return getBound(img, shape)
 
 def genRandomMask(img):
     imgArray = np.array(img)
@@ -54,6 +82,14 @@ def resizeImg(path, noMask = False):
         maskImg = img
     else:
         maskImg = genRandomMask(img)
+        xmin, xmax, ymin, ymax = getFace(img)
+        if not xmin:
+            return None
+        maskImg[:,:xmin] = [0, 0, 0]
+        maskImg[:,xmax:] = [0, 0, 0]
+        maskImg[:ymin,:] = [0, 0, 0]
+        maskImg[ymax:,:] = [0, 0, 0]
+
     target = Image.new('RGB', (img.shape[0]*2, img.shape[1]))
     target.paste(Image.fromarray(img), (0, 0))
     target.paste(Image.fromarray(maskImg), (img.shape[0] + 1, 0))
@@ -63,6 +99,10 @@ for file in os.listdir(folder):
     if not file.endswith(".jpg"):
         continue
     path = os.path.join(folder, file) 
-    print "processing {0}".format(path)
-    result = resizeImg(path, True)
-    result.save(os.path.join(savePath, file))
+    print("processing %s" % (path))
+    result = resizeImg(path, False)
+    if not result:
+        continue
+    resultPath = os.path.join(savePath, file)
+    result.save(resultPath)
+    print("saved to %s" % resultPath)

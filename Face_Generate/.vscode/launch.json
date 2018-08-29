@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "args": [
-                "F:\\Program\\CV_Data\\lfw_all"
+                "D:\\cvDB\\lfw\\lfw"
             ],
             "exceptionHandling": {
                 "always": ["IndexError"],

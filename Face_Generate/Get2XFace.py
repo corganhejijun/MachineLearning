@@ -25,7 +25,7 @@ def getBound(img, shape):
     return xMin, xMax, yMin, yMax
 
 folder = sys.argv[1]
-savePath = "F:\\Program\\CV_Data\\lfw"
+savePath = "D:\\cvDB\\lfw\\lfw_out"
 
 facePath = "Andre_Agassi_0010.jpg"
 standardImg = cv2.cvtColor(cv2.imread(facePath), cv2.COLOR_BGR2RGB)
@@ -53,10 +53,10 @@ def getFaceImg(file):
         return None
     for i in range(shape.num_parts):
         if (shape.part(i).x < 0):
-            print("%d th part x < 0 for %s" % i, file)
+            print("%d th part x < 0 for %s" % (i, file))
             return None
         if (shape.part(i).y < 0):
-            print("%d th part y < 0 for %s" % i, file)
+            print("%d th part y < 0 for %s" % (i, file))
             return None
         controlSrcPts[i] = [shape.part(i).x - xmin, shape.part(i).y - ymin]
     solver = MLSQ.MovingLSQ(controlSrcPts, controlDstPts)
@@ -95,21 +95,25 @@ def getFaceImg(file):
     FaceX2 = np.zeros((deformedImage.shape[0]*2, deformedImage.shape[1]*2, deformedImage.shape[2]))
     for i in range(len(FaceX2)):
         for j in range(len(FaceX2[0])):
-            FaceX2[i][j] = deformedImage[i/2][j/2]
+            FaceX2[i][j] = deformedImage[int(i/2)][int(j/2)]
     fullSize = 256
     if FaceX2.shape[0] > fullSize:
         FaceX2 = FaceX2[:fullSize,:,:]
     if FaceX2.shape[1] > fullSize:
         FaceX2 = FaceX2[:,:fullSize,:]
     fullsizeImg = np.zeros((fullSize, fullSize, 3))
-    left = (fullSize - FaceX2.shape[1])/2
-    top = (fullSize - FaceX2.shape[0])/2
+    left = int((fullSize - FaceX2.shape[1])/2)
+    top = int((fullSize - FaceX2.shape[0])/2)
     fullsizeImg[top:FaceX2.shape[0]+top, left:FaceX2.shape[1]+left, :] = FaceX2
     im = Image.fromarray(fullsizeImg.astype('uint8'))
     im.save(os.path.join(savePath, file[file.rfind('\\') + 1:]))
 
 def processPath(path):
-    for file in os.listdir(path): 
+    fileList = os.listdir(path)
+    if len(fileList) < 2:
+        print("folder %s only has %d files" % (path, len(fileList)))
+        return
+    for file in fileList:
         fullPath = os.path.join(path, file)
         if os.path.isdir(fullPath):
             processPath(fullPath)
@@ -120,6 +124,10 @@ def processPath(path):
         if os.path.exists(os.path.join(savePath, file)):
             continue
         else:
-            getFaceImg(fullPath)
+            try:
+                getFaceImg(fullPath)
+            except Exception as err:
+                print("err " + err)
+
 
 processPath(folder)
