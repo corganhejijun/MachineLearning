@@ -113,21 +113,23 @@ def processPath(path):
     if len(fileList) < 2:
         print("folder %s only has %d files" % (path, len(fileList)))
         return
-    for file in fileList:
-        fullPath = os.path.join(path, file)
-        if os.path.isdir(fullPath):
-            processPath(fullPath)
+    for nameFolder in fileList:
+        fullPath = os.path.join(path, nameFolder)
+        if not os.path.isdir(fullPath):
             continue
-        if not file.endswith(".jpg"):
-            continue
-        print("processing %s" % fullPath)
-        if os.path.exists(os.path.join(savePath, file)):
-            continue
-        else:
-            try:
-                getFaceImg(fullPath)
-            except Exception as err:
-                print("err " + err)
+        for subPath in os.listdir(fullPath):
+            if not subPath.endswith(".jpg"):
+                continue
+            print("processing %s" % subPath)
+            if not os.path.exists(os.path.join(savePath, nameFolder)):
+                os.mkdir(os.path.join(savePath, nameFolder))
+            if os.path.exists(os.path.join(savePath, nameFolder, subPath)):
+                continue
+            else:
+                try:
+                    getFaceImg(os.path.join(fullPath, subPath))
+                except Exception as err:
+                    print("err " + err)
 
 
 processPath(folder)
